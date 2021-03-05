@@ -36,6 +36,9 @@ class Personajes(db.Model):
     homeworld = db.Column(db.String(250), nullable=False)
     films = db.Column(db.String(250), nullable=False)
 
+    def __repr__(self):
+        return '<Personajes %r>' % self.name
+
     def serialize2(self):
         return {
             "id": self.id,
@@ -50,4 +53,50 @@ class Personajes(db.Model):
             "homeworld": self.homeworld,
             "films": self.films
         }
-            
+
+class Planetas(db.Model):
+    __tablename__ = 'planetas'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), unique=True, nullable=False)
+    climate = db.Column(db.String(250), nullable=False)
+    orbital_period = db.Column(db.String(250), nullable=False)
+    rotation = db.Column(db.String(250), nullable=False)
+    terrain = db.Column(db.String(250), nullable=False)
+
+    def __repr__(self):
+        return '<Planetas %r>' % self.name
+
+    def serialize2(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "climate": self.climate,
+            "orbital_period": self.orbital_period,
+            "rotation": self.rotation,
+            "terrain": self.terrain
+        }
+
+class Favoritos(db.Model):
+    __tablename__ = 'favoritos'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    planeta_id = db.Column(db.Integer, db.ForeignKey('planetas.id'))
+    personaje_id = db.Column(db.Integer, db.ForeignKey('personajes.id'))
+    personaje = db.relationship("Personajes")
+    planeta = db.relationship("Planetas")
+    usuario = db.relationship("User")
+
+    def __repr__(self):
+        return '<Favoritos %r>' % self.name
+
+
+    def serialize2(self):
+        return {
+            "id": self.id,
+            "usuario_id": self.usuario_id,
+            "planeta_id": self.planeta_id,
+            "personaje_id": self.planeta_id,
+            #"personaje": self.personaje,
+            #"planeta": self.planeta,
+            #"usuario": self.usuario
+        }   

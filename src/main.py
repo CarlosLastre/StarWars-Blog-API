@@ -8,7 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User,Personajes
+from models import db, User, Personajes, Planetas, Favoritos
+import datetime
 #from models import Person
 
 app = Flask(__name__)
@@ -68,7 +69,7 @@ def personaje_unico(id):
     return jsonify(results), 200
 
 @app.route('/personajes', methods=['POST'])
-def add_fav():
+def add_personaje():
 
     # recibir info del request
     request_body = request.get_json()
@@ -79,6 +80,70 @@ def add_fav():
     db.session.commit()
 
     return jsonify("Un exito, se ha agregado el personaje"), 200
+
+
+@app.route('/planetas', methods=['GET'])
+def planetas_todos():
+
+    query = Planetas.query.all()
+    results = list(map(lambda x: x.serialize2(), query))
+
+    return jsonify(results), 200
+
+@app.route('/planetas/<int:id>', methods=['GET'])
+def planeta_unico(id):
+
+    planeta = Planetas.query.get(id)
+    if planeta is None:
+        raise APIException('Planeta not found', status_code=404)
+    results = planeta.serialize2()
+
+    return jsonify(results), 200
+
+@app.route('/planetas', methods=['POST'])
+def add_fav_planeta():
+
+    # recibir info del request
+    request_body = request.get_json()
+    print(request_body)
+
+    per = Planetas(name=request_body["name"], climate=request_body["climate"], orbital_period=request_body["orbital_period"], rotation=request_body["rotation"], terrain=request_body["terrain"])
+    db.session.add(per)
+    db.session.commit()
+
+    return jsonify("Un exito, se ha agregado el planeta"), 200
+
+
+@app.route('/favoritos', methods=['GET'])
+def favoritos_todos():
+
+    query = Favoritos.query.all()
+    results = list(map(lambda x: x.serialize2(), query))
+
+    return jsonify(results), 200
+
+@app.route('/favoritos/<int:id>', methods=['GET'])
+def favoritos_unico(id):
+
+    favoritos = Favoritos.query.get(id)
+    if favoritos is None:
+        raise APIException('Favorito not found', status_code=404)
+    results = favoritos.serialize2()
+
+    return jsonify(results), 200
+
+@app.route('/favoritos', methods=['POST'])
+def add_fav_favoritos():
+
+    # recibir info del request
+    request_body = request.get_json()
+    print(request_body)
+
+    pera = Favoritos(usuario_id=request_body["usuario_id"], planeta_id=request_body["planeta_id"], personaje_id=request_body["personaje_id"])
+    db.session.add(pera)
+    db.session.commit()
+
+    return jsonify("Un exito, se ha agregado el favorito"), 200
 
 
 # this only runs if `$ python src/main.py` is executed
