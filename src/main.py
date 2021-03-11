@@ -146,6 +146,23 @@ def add_fav_favoritos():
     return jsonify("Un exito, se ha agregado el favorito"), 200
 
 
+@app.route('/del_favoritos/<int:id>', methods=['DELETE'])
+def del_fav(id):
+
+    # recibir info del request
+    
+    fav = Favoritos.query.get(id)
+    if fav is None:
+        raise APIException('Favorite not found', status_code=404)
+
+    db.session.delete(fav)
+
+    db.session.commit()
+
+    return jsonify("Borraste bien la informacion"), 200
+
+
+
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
